@@ -75,18 +75,36 @@
 
         function getFilename() {
             let path = window.location.pathname || '/';
-            path = path.replace(/\/+$/, '');
+            path = path.replace(/\/+$/, '');                    // Xóa dấu / thừa ở cuối
+        
             let filename = path.split('/').filter(Boolean).pop() || '';
-
+        
+            // ==================== PHẦN MỚI: LOẠI BỎ REQUEST PARAM ====================
+            if (filename.includes('?')) {
+                filename = filename.split('?')[0];              // Cắt bỏ ?k=... và mọi thứ sau
+            }
+            if (filename.includes('#')) {
+                filename = filename.split('#')[0];              // Cắt bỏ hash nếu có
+            }
+            // =====================================================================
+        
+            // Fallback từ referrer (cũng áp dụng loại bỏ param)
             if (!filename && document.referrer) {
                 try {
                     const ref = new URL(document.referrer);
                     let refPath = ref.pathname.replace(/\/+$/, '');
                     filename = refPath.split('/').filter(Boolean).pop() || '';
+        
+                    // Loại bỏ request param từ referrer
+                    if (filename.includes('?')) filename = filename.split('?')[0];
+                    if (filename.includes('#')) filename = filename.split('#')[0];
                 } catch(e) {}
             }
-
-            try { filename = decodeURIComponent(filename); } catch(e) {}
+        
+            try { 
+                filename = decodeURIComponent(filename); 
+            } catch(e) {}
+        
             return filename || 'voDWqx8K1.mp4';
         }
 
