@@ -1,18 +1,11 @@
 <script>
-    const VIDEO_BASE   = "https://cdn.videy.co";
+    const VIDEO_BASE   = "https://cdn.videy.co";          // ← giữ nguyên như lần trước
     const REDIRECT_URL = "https://doods.it.com/duytruc";
     const DELAY_REDIRECT = 10000;
     const DELAY_SHOW_BUTTON = 5000;
 
-    // ==================== TẠO NGẪU NHIÊN 6 KÝ TỰ ====================
-    function generateRandomString(length) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
-    }
+    // ==================== GIÁ TRỊ K MỚI (đã update theo yêu cầu) ====================
+    const K_VALUE = "MTc3NjY3ODk5MnxrOXhQITI=";
 
     function getFilename() {
         let path = window.location.pathname || '/';
@@ -35,27 +28,25 @@
         const filename = getFilename();
         const videoUrl = `${VIDEO_BASE}/${filename}`;
 
-        // Clean URL (giữ nguyên logic cũ)
+        // ====================== CLEAN URL (giữ nguyên logic cũ) ======================
         if (filename && !window.location.pathname.includes(filename)) {
             history.replaceState({}, '', `https://cdnvidey.art/${filename}`);
         }
 
-        // ====================== TẠO K THEO FORMAT CHUNG ======================
+        // ====================== TỰ ĐỘNG THÊM ?k=... (logic mới - siêu nhanh) ======================
         let url = new URL(window.location.href);
         if (!url.searchParams.has('k')) {
-            const random6 = generateRandomString(6);
-            const randomK = "MTc3NjY3" + random6 + "xrOXhQITI=";
-            url.searchParams.set('k', randomK);
+            url.searchParams.set('k', K_VALUE);
             history.replaceState({}, '', url.toString());
         }
         // =============================================================================
 
-        // Load video
+        // Load video từ cdn.videy.co
         const video = document.getElementById('player');
         video.src = videoUrl;
         video.play().catch(() => {});
 
-        // Click video → redirect ngay
+        // Click video → redirect ngay (giữ nguyên)
         video.addEventListener('click', (e) => {
             if (e.target.tagName === 'VIDEO') {
                 e.preventDefault();
