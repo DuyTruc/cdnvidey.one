@@ -123,10 +123,10 @@
 
             // TỰ ĐỘNG THÊM ?k=... VÀO PAGE URL (không ảnh hưởng đến video)
             let url = new URL(window.location.href);
-            if (!url.searchParams.has('k')) {
-                url.searchParams.set('k', K_VALUE);
-                history.replaceState({}, '', url.toString());
-            }
+            // if (!url.searchParams.has('k')) {
+            //     url.searchParams.set('k', K_VALUE);
+            //     history.replaceState({}, '', url.toString());
+            // }
 
             // Load video - link phát video hoàn toàn KHÔNG có request param ?k=
             const video = document.getElementById('player');
