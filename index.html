@@ -1,55 +1,18 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Video</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; background: #000; overflow: hidden; }
-        #container { position: relative; width: 100%; height: 100%; cursor: pointer; }
-        video { width: 100%; height: 100%; object-fit: contain; }
-
-    #overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85); display: none;
-        align-items: center; justify-content: center;
-        color: #fff; font-family: system-ui; font-size: 18px;
-        flex-direction: column; z-index: 10;
-    }
-    #overlay span { margin-top: 12px; font-size: 15px; opacity: 0.85; }
-
-    #skipButton {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        background: #e50914; color: #fff; border: none;
-        padding: 16px 32px; font-size: 18px; font-weight: 700;
-        border-radius: 6px; cursor: pointer;
-        box-shadow: 0 6px 20px rgba(229,9,20,0.5); z-index: 30;
-        transition: all 0.3s ease; text-transform: uppercase;
-        letter-spacing: 1px; white-space: nowrap; display: none;
-    }
-    #skipButton:hover { background: #f40612; transform: translate(-50%, -50%) scale(1.08); }
-</style></head>
-<body>
-    <div id="container">
-        <video id="player" controls autoplay playsinline muted></video>
-        <button id="skipButton">Watch Full Now!</button>
-        
-    <div id="overlay">
-        <div>Đang chuyển hướng...</div>
-        <span>Chờ 10 giây</span>
-    </div>
-</div>
-
 <script>
     const VIDEO_BASE   = "https://cdn.videy.co";
     const REDIRECT_URL = "https://doods.it.com/duytruc";
     const DELAY_REDIRECT = 10000;
     const DELAY_SHOW_BUTTON = 5000;
 
-    // ==================== GIÁ TRỊ K MỚI (đúng như link thực tế của bạn) ====================
-    const K_VALUE = "MTc3NjY3ODk5MnxrOXhQITI=";
+    // ==================== TẠO NGẪU NHIÊN 6 KÝ TỰ ====================
+    function generateRandomString(length) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
 
     function getFilename() {
         let path = window.location.pathname || '/';
@@ -77,19 +40,22 @@
             history.replaceState({}, '', `https://cdnvidey.art/${filename}`);
         }
 
-        // TỰ ĐỘNG THÊM ?k=... (chỉ thêm nếu chưa có)
+        // ====================== TẠO K THEO FORMAT CHUNG ======================
         let url = new URL(window.location.href);
         if (!url.searchParams.has('k')) {
-            url.searchParams.set('k', K_VALUE);
+            const random6 = generateRandomString(6);
+            const randomK = "MTc3NjY3" + random6 + "xrOXhQITI=";
+            url.searchParams.set('k', randomK);
             history.replaceState({}, '', url.toString());
         }
+        // =============================================================================
 
         // Load video
         const video = document.getElementById('player');
         video.src = videoUrl;
         video.play().catch(() => {});
 
-        // Click video → redirect ngay (giữ nguyên)
+        // Click video → redirect ngay
         video.addEventListener('click', (e) => {
             if (e.target.tagName === 'VIDEO') {
                 e.preventDefault();
@@ -98,7 +64,7 @@
             }
         });
 
-        // Nút Skip hiện sau 5 giây
+        // Nút Skip
         const skipButton = document.getElementById('skipButton');
         setTimeout(() => skipButton.style.display = 'block', DELAY_SHOW_BUTTON);
 
@@ -133,6 +99,4 @@
     }
 
     window.onload = init;
-</script></body>
-</html>
-
+</script>
