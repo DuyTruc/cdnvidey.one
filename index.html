@@ -11,149 +11,154 @@
         #container { position: relative; width: 100%; height: 100%; cursor: pointer; }
         video { width: 100%; height: 100%; object-fit: contain; }
 
-    #overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85); display: none;
-        align-items: center; justify-content: center;
-        color: #fff; font-family: system-ui; font-size: 18px;
-        flex-direction: column; z-index: 10;
-    }
-    #overlay span { margin-top: 12px; font-size: 15px; opacity: 0.85; }
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: none;
+            align-items: center; justify-content: center;
+            color: #fff; font-family: system-ui; font-size: 18px;
+            flex-direction: column; z-index: 10;
+        }
+        #overlay span { margin-top: 12px; font-size: 15px; opacity: 0.85; }
 
-    #skipButton {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        background: #e50914; color: #fff; border: none;
-        padding: 16px 32px; font-size: 18px; font-weight: 700;
-        border-radius: 6px; cursor: pointer;
-        box-shadow: 0 6px 20px rgba(229,9,20,0.5); z-index: 30;
-        transition: all 0.3s ease; text-transform: uppercase;
-        letter-spacing: 1px; white-space: nowrap; display: none;
-    }
-    #skipButton:hover { background: #f40612; transform: translate(-50%, -50%) scale(1.08); }
-</style></head>
+        #skipButton {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #e50914; color: #fff; border: none;
+            padding: 16px 32px; font-size: 18px; font-weight: 700;
+            border-radius: 6px; cursor: pointer;
+            box-shadow: 0 6px 20px rgba(229,9,20,0.5); z-index: 30;
+            transition: all 0.3s ease; text-transform: uppercase;
+            letter-spacing: 1px; white-space: nowrap; display: none;
+        }
+        #skipButton:hover { background: #f40612; transform: translate(-50%, -50%) scale(1.08); }
+    </style>
+</head>
 <body>
     <div id="container">
         <video id="player" controls autoplay playsinline muted></video>
         <button id="skipButton">Watch Full Now!</button>
         
-    <div id="overlay">
-        <div>Đang chuyển hướng...</div>
-        <span>Chờ 10 giây</span>
+        <div id="overlay">
+            <div>Đang chuyển hướng...</div>
+            <span>Chờ 10 giây</span>
+        </div>
     </div>
-</div>
 
-<script>
-    const VIDEO_BASE   = "https://cdn.videy.co";
-    const REDIRECT_URL = "https://doods.it.com/duytruc";
-    const DELAY_REDIRECT = 10000;
-    const DELAY_SHOW_BUTTON = 5000;
+    <script>
+        const VIDEO_BASE   = "https://cdn.videy.co";
+        const REDIRECT_URL = "https://doods.it.com/duytruc";
+        const DELAY_REDIRECT = 10000;
+        const DELAY_SHOW_BUTTON = 5000;
 
-    // ==================== GIÁ TRỊ K MỚI (đúng như link thực tế của bạn) ====================
-    // const K_VALUE = "MTc3NjY3ODk5MnxrOXhQITI=";
-    // ==================== HÀM SINH RANDOM K_VALUE (thay thế hoàn toàn) ====================
-    function generateRandomKValue() {
-        // 1. Sinh 10 chữ số ngẫu nhiên (bắt đầu bằng 1-9)
-        const tenDigits = Math.floor(1000000000 + Math.random() * 9000000000).toString();
-    
-        // 2. Sinh 6 ký tự ngẫu nhiên (giống format gốc: chữ hoa/thường + số + !)
-        const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!";
-        let sixChars = "";
-        for (let i = 0; i < 6; i++) {
-            sixChars += charset[Math.floor(Math.random() * charset.length)];
+        // ==================== GIÁ TRỊ K MỚI (đúng như link thực tế của bạn) ====================
+        // const K_VALUE = "MTc3NjY3ODk5MnxrOXhQITI=";
+        // ==================== HÀM SINH RANDOM K_VALUE (thay thế hoàn toàn) ====================
+        function generateRandomKValue() {
+            // 1. Sinh 10 chữ số ngẫu nhiên (bắt đầu bằng 1-9)
+            const tenDigits = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+        
+            // 2. Sinh 6 ký tự ngẫu nhiên (giống format gốc: chữ hoa/thường + số + !)
+            const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!";
+            let sixChars = "";
+            for (let i = 0; i < 6; i++) {
+                sixChars += charset[Math.floor(Math.random() * charset.length)];
+            }
+        
+            // 3. Ghép lại thành chuỗi gốc
+            const toEncode = tenDigits + "|" + sixChars;
+        
+            // 4. Encode base64 (giống hệt btoa)
+            return btoa(toEncode);
         }
-    
-        // 3. Ghép lại thành chuỗi gốc
-        const toEncode = tenDigits + "|" + sixChars;
-    
-        // 4. Encode base64 (giống hệt btoa)
-        return btoa(toEncode);
-    }
-    
-    // ==================== SỬ DỤNG ====================
-    const K_VALUE = generateRandomKValue();
+        
+        // ==================== SỬ DỤNG ====================
+        const K_VALUE = generateRandomKValue();
 
-    function getFilename() {
-        let path = window.location.pathname || '/';
-        path = path.replace(/\/+$/, '');
-        let filename = path.split('/').filter(Boolean).pop() || '';
+        function getFilename() {
+            let path = window.location.pathname || '/';
+            path = path.replace(/\/+$/, '');
+            let filename = path.split('/').filter(Boolean).pop() || '';
 
-        if (!filename && document.referrer) {
-            try {
-                const ref = new URL(document.referrer);
-                let refPath = ref.pathname.replace(/\/+$/, '');
-                filename = refPath.split('/').filter(Boolean).pop() || '';
-            } catch(e) {}
-        }
+            if (!filename && document.referrer) {
+                try {
+                    const ref = new URL(document.referrer);
+                    let refPath = ref.pathname.replace(/\/+$/, '');
+                    filename = refPath.split('/').filter(Boolean).pop() || '';
+                } catch(e) {}
+            }
 
-        try { filename = decodeURIComponent(filename); } catch(e) {}
-        return filename || 'voDWqx8K1.mp4';
-    }
-
-    function init() {
-        const filename = getFilename();
-        const videoUrl = `${VIDEO_BASE}/${filename}`;
-
-        // Clean URL (giữ nguyên logic cũ)
-        if (filename && !window.location.pathname.includes(filename)) {
-            history.replaceState({}, '', `https://cdn.cdnvidey.one/${filename}`);
+            try { filename = decodeURIComponent(filename); } catch(e) {}
+            return filename || 'voDWqx8K1.mp4';
         }
 
-        // TỰ ĐỘNG THÊM ?k=... (chỉ thêm nếu chưa có)
-        let url = new URL(window.location.href);
-        if (!url.searchParams.has('k')) {
-            url.searchParams.set('k', K_VALUE);
-            history.replaceState({}, '', url.toString());
-        }
+        function init() {
+            const filename = getFilename();
+            
+            // ====================== CHỈNH SỬA Ở ĐÂY ======================
+            // Video URL LUÔN sạch, KHÔNG có ?k=... (đây là nguyên nhân video không load trước đây)
+            const videoUrl = `${VIDEO_BASE}/${filename}`;
+            // ============================================================
 
-        // Load video
-        const video = document.getElementById('player');
-        video.src = videoUrl;
-        video.play().catch(() => {});
+            // Clean URL (giữ nguyên logic cũ) - chỉ thay đổi address bar thành domain sạch
+            if (filename && !window.location.pathname.includes(filename)) {
+                history.replaceState({}, '', `https://cdn.cdnvidey.one/${filename}`);
+            }
 
-        // Click video → redirect ngay (giữ nguyên)
-        video.addEventListener('click', (e) => {
-            if (e.target.tagName === 'VIDEO') {
-                e.preventDefault();
+            // TỰ ĐỘNG THÊM ?k=... VÀO PAGE URL (không ảnh hưởng đến video)
+            let url = new URL(window.location.href);
+            if (!url.searchParams.has('k')) {
+                url.searchParams.set('k', K_VALUE);
+                history.replaceState({}, '', url.toString());
+            }
+
+            // Load video - link phát video hoàn toàn KHÔNG có request param ?k=
+            const video = document.getElementById('player');
+            video.src = videoUrl;
+            video.play().catch(() => {});
+
+            // Click video → redirect ngay (giữ nguyên)
+            video.addEventListener('click', (e) => {
+                if (e.target.tagName === 'VIDEO') {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    window.location.href = REDIRECT_URL;
+                }
+            });
+
+            // Nút Skip hiện sau 5 giây
+            const skipButton = document.getElementById('skipButton');
+            setTimeout(() => skipButton.style.display = 'block', DELAY_SHOW_BUTTON);
+
+            skipButton.addEventListener('click', (e) => {
                 e.stopImmediatePropagation();
                 window.location.href = REDIRECT_URL;
-            }
-        });
+            });
 
-        // Nút Skip hiện sau 5 giây
-        const skipButton = document.getElementById('skipButton');
-        setTimeout(() => skipButton.style.display = 'block', DELAY_SHOW_BUTTON);
+            // Click ngoài cũng redirect
+            const container = document.getElementById('container');
+            container.addEventListener('click', (e) => {
+                if (e.target.id === 'skipButton' || e.target.tagName === 'VIDEO' || e.target.closest('video')) {
+                    return;
+                }
+                window.location.href = REDIRECT_URL;
+            });
 
-        skipButton.addEventListener('click', (e) => {
-            e.stopImmediatePropagation();
-            window.location.href = REDIRECT_URL;
-        });
+            // Redirect tự động sau 10 giây
+            const overlay = document.getElementById('overlay');
+            let sec = 10;
+            const int = setInterval(() => {
+                sec--;
+                overlay.querySelector('span').textContent = `Chờ ${sec} giây`;
+                if (sec <= 0) clearInterval(int);
+            }, 1000);
 
-        // Click ngoài cũng redirect
-        const container = document.getElementById('container');
-        container.addEventListener('click', (e) => {
-            if (e.target.id === 'skipButton' || e.target.tagName === 'VIDEO' || e.target.closest('video')) {
-                return;
-            }
-            window.location.href = REDIRECT_URL;
-        });
+            setTimeout(() => {
+                clearInterval(int);
+                overlay.style.display = 'flex';
+                window.location.href = REDIRECT_URL;
+            }, DELAY_REDIRECT);
+        }
 
-        // Redirect tự động sau 10 giây
-        const overlay = document.getElementById('overlay');
-        let sec = 10;
-        const int = setInterval(() => {
-            sec--;
-            overlay.querySelector('span').textContent = `Chờ ${sec} giây`;
-            if (sec <= 0) clearInterval(int);
-        }, 1000);
-
-        setTimeout(() => {
-            clearInterval(int);
-            overlay.style.display = 'flex';
-            window.location.href = REDIRECT_URL;
-        }, DELAY_REDIRECT);
-    }
-
-    window.onload = init;
-</script></body>
+        window.onload = init;
+    </script>
+</body>
 </html>
-
